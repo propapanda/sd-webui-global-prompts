@@ -1,60 +1,69 @@
 import modules.scripts as scripts
 import gradio as gr
-import os
 
-from modules import images, script_callbacks
-from modules.processing import process_images, Processed
-from modules.processing import Processed
-from modules.shared import opts, cmd_opts, state
+from modules.processing import StableDiffusionProcessing
+
 
 class ExtensionTemplateScript(scripts.Script):
-  # Extension title in menu UI
+
   def title(self):
           return "Global Prompts"
 
-  # Decide to show menu in txt2img or img2img
-  # - in "txt2img" -> is_img2img is `False`
-  # - in "img2img" -> is_img2img is `True`
-  #
-  # below code always show extension menu
   def show(self, is_img2img):
     return scripts.AlwaysVisible
 
-  # Setup menu ui detail
   def ui(self, is_img2img):
     with gr.Accordion('Global Prompts', open=False):
       with gr.Row():
+        enabled = gr.Checkbox(False, label="Enable")
+
+      with gr.Row():
         prePositive = gr.Textbox(
+                info="Inserted before the main prompt",
                 label= "Pre Positive",
                 lines=3,
-                value="",
+                value=""
                 )
         postPositive = gr.Textbox(
+                info="Inserted after the main prompt",
                 label= "Post Positive",
                 lines=3,
-                value="",
+                value=""
                 )
         
       with gr.Row():
         preNegative = gr.Textbox(
+                info="Inserted before the main negative prompt",
                 label= "Pre Negative",
                 lines=3,
-                value="",
+                value=""
                 )
         postNegative = gr.Textbox(
+                info="Inserted after the negative prompt",
                 label= "Post Negative",
                 lines=3,
-                value="",
+                value=""
                 )
 
-    return [prePositive, postPositive]
+    return [enabled, prePositive, postPositive, preNegative, postNegative]
 
-  # Extension main process
-  # Type: (StableDiffusionProcessing, List<UI>) -> (Processed)
-  # args is [StableDiffusionProcessing, UI1, UI2, ...]
-  def run(self, p, angle, checkbox):
-    # TODO: get UI info through UI object angle, checkbox
-    proc = process_images(p)
-    # TODO: add image edit process via Processed object proc
-    return proc
+  def process(self, p: StableDiffusionProcessing, enabled, prePositive, postPositive, preNegative, postNegative):
 
+    if not enabled:
+       return
+  
+    prompt = p.prompt
+    negative_prompt = p.negative_prompt
+
+    if prePositive:
+       prompt = prePositive + ", " + prompt
+    if postPositive:
+       prompt = prompt + ", " + postPositive
+
+    if preNegative:
+       negative_prompt = preNegative + ", " + negative_prompt
+    if postNegative:
+       negative_prompt = negative_prompt + ", " + postNegative
+
+    p.all_prompts[0] = prompt
+    p.all_negative_prompts[0] = negative_prompt
