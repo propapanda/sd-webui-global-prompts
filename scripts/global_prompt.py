@@ -20,13 +20,13 @@ class ExtensionTemplateScript(scripts.Script):
       with gr.Row():
         prePositive = gr.Textbox(
                 info="Inserted before the main prompt",
-                label= "Pre Positive",
+                label= "Positive Prefix",
                 lines=3,
                 value=""
                 )
         postPositive = gr.Textbox(
                 info="Inserted after the main prompt",
-                label= "Post Positive",
+                label= "Positive Postfix",
                 lines=3,
                 value=""
                 )
@@ -34,13 +34,13 @@ class ExtensionTemplateScript(scripts.Script):
       with gr.Row():
         preNegative = gr.Textbox(
                 info="Inserted before the main negative prompt",
-                label= "Pre Negative",
+                label= "Negative Prefix",
                 lines=3,
                 value=""
                 )
         postNegative = gr.Textbox(
                 info="Inserted after the negative prompt",
-                label= "Post Negative",
+                label= "Negative Postfix",
                 lines=3,
                 value=""
                 )
